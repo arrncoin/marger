@@ -1,0 +1,59 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
+  "appId": "com.kakjule.livestreambot",
+  "productName": "Kak Jule Studio",
+  "copyright": "Copyright © 2026 Kak Jule",
+  "directories": {
+    "output": "dist-electron",
+    "buildResources": "assets"
+  },
+  "files": [
+    "electron/**/*",
+    "src/**/*",
+    "core/**/*",
+    "app/**/*",
+    "overlay/**/*",
+    "assets/**/*",
+    "index.js",
+    "package.json",
+    "!dist-electron/**/*",
+    "!*.bat",
+    "!*.ps1",
+    "!scripts/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "assets",
+      "to": "assets",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "assets/icon.ico",
+    "requestedExecutionLevel": "asInvoker"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Kak Jule Studio"
+  },
+  "portable": {
+    "artifactName": "Kak-Jule-Studio-Portable-${version}.exe"
+  },
+  "asar": true,
+  "forceCodeSigning": false,
+  "npmRebuild": false
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920, initial-scale=1.0, user-scalable=no">
+    <title>LABIRIN — OBS Live Maze Race Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@500;700;800;900&family=Chakra+Petch:wght@600;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1.0">
+</head>
+<body>
+    <div id="labirin-overlay" class="labirin-root">
+        <!-- Background Canvas FX for Winner Confetti & Particles -->
+        <canvas id="fx-canvas" width="1080" height="1920"></canvas>
+
+        <!-- Ambient Lights -->
+        <div class="ambient-glow cyan-glow"></div>
+        <div class="ambient-glow purple-glow"></div>
+        <div id="winner-glow" class="ambient-glow gold-glow hidden"></div>
+
+        <!-- OVERLAY MAIN FRAME (1080x1920) -->
+        <div class="frame-container">
+            <!-- 1. HEADER BRAND -->
+            <header class="header-section">
+                <div class="brand-row">
+                    <div class="brand-badge">
+                        <span class="brand-icon"><react-icon name="GiMaze" size="28px"></react-icon></span>
+                        <div class="brand-titles">
+                            <span class="brand-name">LABIRIN RACE</span>
+                            <span class="brand-sub">LIVECHAT MULTIPLAYER MAZE</span>
+                        </div>
+                    </div>
+                    <div id="status-badge" class="status-badge badge-idle">STANDBY</div>
+                </div>
+
+                <!-- Stats summary bar -->
+                <div class="stats-bar">
+                    <div class="stat-card">
+                        <span class="stat-label"><react-icon name="FaUsers"></react-icon> PESERTA</span>
+                        <span id="stat-players" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label"><react-icon name="FaStopwatch"></react-icon> WAKTU</span>
+                        <span id="stat-timer" class="stat-value">0.0s</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label"><react-icon name="FaFlagCheckered"></react-icon> SELESAI</span>
+                        <span id="stat-finished" class="stat-value">0</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 2. GAME ARENA / MAZE CONTAINER -->
+            <main class="arena-section">
+                <!-- MAZE CANVAS -->
+                <div class="maze-wrapper">
+                    <canvas id="maze-canvas" width="980" height="980"></canvas>
+
+                    <!-- Overlay Banner for Countdown / Lobby -->
+                    <div id="lobby-banner" class="banner-overlay hidden">
+                        <div class="banner-content">
+                            <span class="banner-title">PENDAFTARAN DIBUKA!</span>
+                            <div class="banner-timer" id="lobby-timer-val">20</div>
+                            <span class="banner-cta">Ketik <b class="highlight">!join</b> di chat untuk balapan!</span>
+                        </div>
+                    </div>
+
+                    <div id="countdown-banner" class="banner-overlay hidden">
+                        <div class="banner-content">
+                            <span class="banner-title">BERSIAP...</span>
+                            <div class="countdown-number" id="countdown-number-val">3</div>
+                            <span class="banner-cta">Mulai dalam hitungan detik!</span>
+                        </div>
+                    </div>
+
+                    <!-- Idle Screen Overlay -->
+                    <div id="idle-screen" class="banner-overlay">
+                        <div class="banner-content">
+                            <div class="idle-icon"><react-icon name="GiMaze" size="84px" color="#00f2fe"></react-icon></div>
+                            <h2 class="idle-heading">ARENA LABIRIN STANDBY</h2>
+                            <p class="idle-desc">Tantang penonton menemukan jalan keluar dari labirin misteri tercepat!</p>
+                            <div class="idle-command-badge">Perintah Streamer: <code>!labirin</code></div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 3. FOOTER: CONTROLS & LEADERBOARD -->
+            <footer class="footer-section">
+                <!-- Controls Quick Guide -->
+                <div class="controls-guide">
+                    <div class="guide-title"><react-icon name="FaGamepad"></react-icon> KONTROL GERAKAN CHAT</div>
+                    <div class="guide-buttons">
+                        <div class="control-key"><span><react-icon name="FaArrowUp"></react-icon></span> <code>!atas</code></div>
+                        <div class="control-key"><span><react-icon name="FaArrowDown"></react-icon></span> <code>!bawah</code></div>
+                        <div class="control-key"><span><react-icon name="FaArrowLeft"></react-icon></span> <code>!kiri</code></div>
+                        <div class="control-key"><span><react-icon name="FaArrowRight"></react-icon></span> <code>!kanan</code></div>
+                    </div>
+                </div>
+
+                <!-- Live Race Leaderboard / Podiums -->
+                <div class="leaderboard-section">
+                    <div class="leaderboard-header">
+                        <span class="lb-title"><react-icon name="FaTrophy" color="#ffd166"></react-icon> KLASEMEN FINISHER</span>
+                        <span id="lb-count-label" class="lb-count">0 Selesai</span>
+                    </div>
+                    <div id="leaderboard-list" class="leaderboard-list">
+                        <div class="empty-lb">Belum ada pemain yang berhasil mencapai jalan keluar (EXIT).</div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- WINNER POPUP MODAL -->
+        <div id="winner-modal" class="winner-modal hidden">
+            <div class="winner-box">
+                <div class="winner-trophy"><react-icon name="FaTrophy" color="#ffd166" size="96px"></react-icon></div>
+                <div class="winner-announce">PEMENANG LABIRIN!</div>
+                <div id="winner-name" class="winner-username">Player Name</div>
+                <div class="winner-stats-grid">
+                    <div class="wstat">
+                        <span class="wstat-label"><react-icon name="FaStopwatch"></react-icon> Waktu Selesai</span>
+                        <span id="winner-time" class="wstat-val">12.48s</span>
+                    </div>
+                    <div class="wstat">
+                        <span class="wstat-label"><react-icon name="FaShoePrints"></react-icon> Jumlah Langkah</span>
+                        <span id="winner-moves" class="wstat-val">37 langkah</span>
+                    </div>
+                    <div class="wstat">
+                        <span class="wstat-label"><react-icon name="FaCoins" color="#ffd166"></react-icon> Bonus Poin</span>
+                        <span id="winner-points" class="wstat-val">+50 POIN</span>
+                    </div>
+                </div>
+                <div class="winner-tagline">Finisher pertama dan tercepat mencapai jalan keluar!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- React Icons Client Library & Script Overlay Labirin -->
+    <script src="/assets/react-icons.js"></script>
+    <script src="app.js?v=1.1"></script>
+</body>
+</html>

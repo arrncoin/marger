@@ -1,0 +1,6 @@
+{
+  "name": "TikTok LIVE Singer & Event Reader",
+  "description": "Real-time TikTok LIVE event reader, gift counter, TTS voice announcer, and streamer interactive dashboard with priority queue and OBS overlay support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
